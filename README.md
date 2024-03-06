@@ -1,4 +1,5 @@
-FFmpeg README
+# FFmpeg README
+
 =============
 
 FFmpeg is a collection of libraries and tools to process multimedia content
@@ -32,15 +33,34 @@ and in the [wiki](https://trac.ffmpeg.org).
 
 ## How to build on macOS 10.13.6
 
+Using option '--enable-shared' to enable dylib building
+
 ```bash
+LIBFFI_CFLAGS=-I/usr/include/ffi LIBFFI_LIBS=-lffi ./configure --prefix=/usr/local/Cellar/ffmpeg/5.1.2 --enable-swresample --enable-shared --enable-audiotoolbox --enable-videotoolbox --enable-opencl --enable-gpl 
 ./configure --prefix=/usr/local/Cellar/ffmpeg/5.1.2 --enable-static --disable-runtime-cpudetect --disable-doc --enable-swresample --disable-swscale --disable-postproc --disable-avfilter --disable-debug --enable-audiotoolbox --disable-sdl2 --enable-videotoolbox --enable-opencl --enable-gpl --disable-shared --disable-iconv
 MACOSX_DEPLOYMENT_TARGET=10.13.6 CC=clang CXX=clang++ make -j10
 sudo make install
 ```
 
-### Issue1:  to solve for ffmpeg on macOS 10.13.6
+Using option '--enable-shared' to enable dylib building and compile with pkg-config with libraries under conda
 
-change /System/Library/Frameworks/Security.framework/Headers/SecImportExport.h and /System/Library/Frameworks/Security.framework/Headers/SecItem.h for checking bridgeos macros's availability
+```txt
+(base) Orlando:~ llv23$ ls /Users/llv23/opt/miniconda3/lib/libglib-2.0.dylib 
+/Users/llv23/opt/miniconda3/lib/libglib-2.0.dylib
+(base) Orlando:~ llv23$ ls /Users/llv23/opt/miniconda3/lib/libgio-2.0.dylib 
+/Users/llv23/opt/miniconda3/lib/libgio-2.0.dylib
+```
+
+Regarding how to build for pkg-config on macOS, please check the [reference](https://trac.ffmpeg.org/wiki/CompilationGuide/macOS).
+
+```bash
+GLIB_CFLAGS="-I/Users/llv23/opt/miniconda3/include" GLIB_LIBS="-lglib-2.0 -lgio-2.0" ./configure --with-pc-path="/usr/lib/pkgconfig:/usr/local/lib/pkgconfig" --prefix=/usr/local/Cellar/ffmpeg/5.1.2 --enable-swresample --enable-shared --enable-audiotoolbox --enable-videotoolbox --enable-opencl --enable-gpl 
+GLIB_CFLAGS="-I/Users/llv23/opt/miniconda3/include" GLIB_LIBS="-lglib-2.0 -lgio-2.0" ./configure --prefix=/usr/local/Cellar/ffmpeg/5.1.2 --enable-swresample --enable-shared --enable-audiotoolbox --enable-videotoolbox --enable-opencl --enable-gpl 
+```
+
+### Issue 1:  to solve for ffmpeg on macOS 10.13.6
+
+Change /System/Library/Frameworks/Security.framework/Headers/SecImportExport.h and /System/Library/Frameworks/Security.framework/Headers/SecItem.h for checking bridgeos macros's availability
 
 ```c++
 #ifdef bridgeos
@@ -48,12 +68,20 @@ change /System/Library/Frameworks/Security.framework/Headers/SecImportExport.h a
 #end
 ```
 
-### Issue2:  to avoid refined 
+### Issue 2:  to avoid refined
 
 ```c++
 #if !HAVE_KCMVIDEOCODECTYPE_HEVC && !defined(__APPLE__) && !defined(__MACH__)
 enum { kCMVideoCodecType_HEVC = 'hvc1' };
 #endif
+```
+
+### Issue 3: can't find Pkg-config
+
+define PKG_CONFIG_PATH in ~/.bash_profile
+
+```bash
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/local/Cellar/ffmpeg/5.1.2/lib/pkgconfig
 ```
 
 ### Examples
