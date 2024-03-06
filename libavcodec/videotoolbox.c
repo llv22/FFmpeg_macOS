@@ -46,7 +46,7 @@
 #  define kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder CFSTR("EnableHardwareAcceleratedVideoDecoder")
 #endif
 
-#if !HAVE_KCMVIDEOCODECTYPE_HEVC
+#if !HAVE_KCMVIDEOCODECTYPE_HEVC && !defined(__APPLE__) && !defined(__MACH__)
 enum { kCMVideoCodecType_HEVC = 'hvc1' };
 #endif
 

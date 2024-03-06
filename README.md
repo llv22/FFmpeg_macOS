@@ -30,6 +30,32 @@ The offline documentation is available in the **doc/** directory.
 The online documentation is available in the main [website](https://ffmpeg.org)
 and in the [wiki](https://trac.ffmpeg.org).
 
+## How to build on macOS 10.13.6
+
+```bash
+./configure --prefix=/usr/local/Cellar/ffmpeg/5.1.2 --enable-static --disable-runtime-cpudetect --disable-doc --enable-swresample --disable-swscale --disable-postproc --disable-avfilter --disable-debug --enable-audiotoolbox --disable-sdl2 --enable-videotoolbox --enable-opencl --enable-gpl --disable-shared --disable-iconv
+MACOSX_DEPLOYMENT_TARGET=10.13.6 CC=clang CXX=clang++ make -j10
+sudo make install
+```
+
+### Issue1:  to solve for ffmpeg on macOS 10.13.6
+
+change /System/Library/Frameworks/Security.framework/Headers/SecImportExport.h and /System/Library/Frameworks/Security.framework/Headers/SecItem.h for checking bridgeos macros's availability
+
+```c++
+#ifdef bridgeos
+#else
+#end
+```
+
+### Issue2:  to avoid refined 
+
+```c++
+#if !HAVE_KCMVIDEOCODECTYPE_HEVC && !defined(__APPLE__) && !defined(__MACH__)
+enum { kCMVideoCodecType_HEVC = 'hvc1' };
+#endif
+```
+
 ### Examples
 
 Coding examples are available in the **doc/examples** directory.
